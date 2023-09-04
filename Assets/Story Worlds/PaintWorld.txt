@@ -1,0 +1,102 @@
+storyworld PaintWorld
+{
+	user: TallPainter;
+	
+	entity TallPainter
+	{
+		string: name, "Tall Painter";
+		image: standing, tallPainterStanding;
+		image: paintingRed, tallPainterPaintingRed;
+		image: paintingYellow, tallPainterPaintingYellow;
+		image: paintingBlue, tallPainterPaintingBlue;
+		image: walking, tallPainterWalking;
+	}
+	
+	entity ShortPainter
+	{
+		string: name, "Short Painter";
+		image: standing, shortPainterStanding;
+		image: paintingRed, shortPainterPaintingRed;
+		image: paintingYellow, shortPainterPaintingYellow;
+		image: paintingBlue, shortPainterPaintingBlue;
+		image: walking, shortPainterWalking;
+	}
+	
+	entity RoomRed
+	{
+		string: name, "red room";
+		tag: room;
+		image: room, roomRed;
+		image: door, roomRedDoor;
+	}
+	
+	entity RoomYellow
+	{
+		string: name, "yellow room";
+		tag: room;
+		image: room, roomYellow;
+		image: door, roomYellowDoor;
+	}
+	
+	entity RoomBlue
+	{
+		string: name, "blue room";
+		tag: room;
+		image: room, roomBlue;
+		image: door, roomBlueDoor;
+	}
+	
+	input
+	{
+		draw: RoomRed.room, 0, 0;
+		draw: TallPainter.standing, -400, 0;
+		text: "What does the Tall Painter do next?";
+	}
+	
+	verb Walk
+	{
+		icon: walkIcon;
+	
+		variable ?fromLoc
+		{
+			where: ?me.at = ?fromLoc;
+			where: ?fromLoc has tag room;
+		}
+		
+		variable ?userLoc
+		{
+			where: TallPainter.at = ?userLoc; 
+			where: ?userLoc has tag room;
+		}
+		
+		argument ?toLoc
+		{
+			text: "Where to next?";
+			where: ?toLoc.connected = ?fromLoc;
+			where: ?toLoc has tag room;
+		}
+
+		preconditions
+		{
+			where: ?fromLoc has entity;
+		}
+		
+		case default
+		{
+			do: ?me add relate at, ?toLoc;
+			do: ?me remove relate at, ?fromLoc;
+			
+			page verb
+			{
+				draw: ?toLoc.room, 0, 0;
+				draw: ?me.walking, 0, 0;
+				text: "?me walked from ?fromLoc to ?toLoc.";
+			}
+		}
+		
+		discriminator
+		{
+			where: ?toLoc = ?userLoc; //New condition type
+		}
+	}
+}
